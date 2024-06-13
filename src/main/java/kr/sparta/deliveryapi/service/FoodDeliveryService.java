@@ -14,13 +14,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
-public class FoodDeliveryService implements TrackingNoGenerator{
+public class FoodDeliveryService extends OrderBaseService {
     private final FoodRepository foodRepository;
-    private final DeliveryRepository deliveryRepository;
 
     public FoodDeliveryService(FoodRepository foodRepository, DeliveryRepository deliveryRepository) {
+        super(deliveryRepository);
         this.foodRepository = foodRepository;
-        this.deliveryRepository = deliveryRepository;
     }
 
     @Override
@@ -37,22 +36,9 @@ public class FoodDeliveryService implements TrackingNoGenerator{
                 .name(food.getName())
                 .build();
 
-        deliveryRepository.save(delivery);
+        super.deliveryRepository.save(delivery);
 
         return delivery;
-    }
-
-    @Override
-    public String generateTrackingNo(String description) {
-        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS"))
-                + String.valueOf(description.hashCode()).substring(0, 4);
-    }
-
-    @Override
-    public DeliveryStatus trackOrder(String trackingNumber) {
-        return deliveryRepository.findById(trackingNumber)
-                .map(Delivery::getStatus)
-                .orElseThrow(IllegalReceiveException::new);
     }
 
     @Override

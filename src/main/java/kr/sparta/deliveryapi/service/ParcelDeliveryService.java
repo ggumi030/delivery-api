@@ -14,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
-public class ParcelDeliveryService {
+public class ParcelDeliveryService implements TrackingNoGenerator{
     private final DeliveryRepository deliveryRepository;
     private final ParcelRepository parcelRepository;
 
@@ -23,7 +23,8 @@ public class ParcelDeliveryService {
         this.parcelRepository = parcelRepository;
     }
 
-    public Delivery deliverParcel(Long parcelId) {
+    @Override
+    public Delivery deliverOrder(Long parcelId) {
         final Parcel parcel = parcelRepository.findById(parcelId)
                 .orElseThrow(IllegalArgumentException::new);
 
@@ -41,18 +42,21 @@ public class ParcelDeliveryService {
         return delivery;
     }
 
-    private String generateTrackingNo(String description) {
+    @Override
+    public String generateTrackingNo(String description) {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS"))
                 + String.valueOf(description.hashCode()).substring(0, 4);
     }
 
-    public DeliveryStatus trackParcel(String trackingNumber) {
+    @Override
+    public DeliveryStatus trackOrder(String trackingNumber) {
         return deliveryRepository.findById(trackingNumber)
                 .map(Delivery::getStatus)
                 .orElseThrow(IllegalReceiveException::new);
     }
 
-    public List<Parcel> getAllParcels() {
+    @Override
+    public List<Parcel> getAllOrders() {
         return parcelRepository.findAll();
     }
 }

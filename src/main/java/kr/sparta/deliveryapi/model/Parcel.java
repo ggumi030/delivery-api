@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Entity
 @Getter
-public class Parcel {
+public class Parcel implements OrderMember{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
